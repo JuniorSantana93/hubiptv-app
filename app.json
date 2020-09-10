@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "hubiptvplayerreactapp",
-    "slug": "hubiptvplayerreactapp",
+    "name": "Hubiptv",
+    "slug": "Hubiptv",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "orientation": "default",
+    "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/logo_black_back_white.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,8 +19,11 @@
     "ios": {
       "supportsTablet": true
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "platforms": [
+      "android"
+    ],
+    "android": {
+      "package": "com.hubiptv.app"
     }
   }
 }

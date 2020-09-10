@@ -1,21 +1,26 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+//import { StatusBar } from "expo-status-bar";
+import React, { useState, useRef } from "react";
+import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
+/* import { Video } from "expo-av";
+import { useFonts } from 'expo-font'; */
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+// Screens
+import Player from './src/Player';
+import Home from './src/Home';
+import ChannelOptions from './src/channelsOptions';
+
+const Stack = createStackNavigator();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+   return (
+      <NavigationContainer>
+         <Stack.Navigator>
+            <Stack.Screen name="Home" options={{headerShown: false}} component={Home}/>
+            <Stack.Screen name="ChannelOptions" options={{headerShown: false}} component={ChannelOptions}/>
+            <Stack.Screen name="Player" options={{headerShown: false}} component={Player}/>
+         </Stack.Navigator>
+      </NavigationContainer>
+   )
+};
