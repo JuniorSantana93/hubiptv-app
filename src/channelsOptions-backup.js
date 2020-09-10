@@ -4,7 +4,7 @@ import {
    Text,
    View,
    TouchableHighlight,
-   ScrollView,
+   FlatList,
    Image,
    ActivityIndicator,
    TextInput,
@@ -16,8 +16,6 @@ export default function ChannelOptions({ route, navigation }) {
    let [data, setData] = useState(null);
    let [isMounted, setIsMounted] = useState(false);
    let [currentList, setCurrentList] = useState(null);
-   let [showLimit,setShowLimit] = useState(100);
-   let ScrollDiv = useRef('scrolldiv');
 
    // Use effect
    useEffect(() => {
@@ -28,7 +26,7 @@ export default function ChannelOptions({ route, navigation }) {
          let res = await req.text();
          res = getJsonList(res);
          setData(res);
-         setCurrentList(res);
+         setCurrentList(res.splice(0,100));
       })();
    });
 
@@ -72,52 +70,49 @@ export default function ChannelOptions({ route, navigation }) {
       return channels;
    }
 
-   function Body() {
-      let count = 0;
-      return currentList.map((e) => {
-         count++;
-         if (count > showLimit) return;
-         return (
-            <TouchableHighlight
-               onPress={() =>
-                  navigation.navigate("Player", {
-                     url: e.video_url,
-                     name: e.channel_name,
-                     group: e.group,
-                  })
-               }
-               key={e.channel_name + Math.round(Math.random() * 1000)}
-               style={styles.canal}
-               underlayColor="rgb(200,200,200)"
-            >
-               <>
-                  <Image
-                     resizeMode="contain"
-                     style={styles.canal_img}
-                     source={{
-                        uri: e.img
-                           ? e.img
-                           : "https://image.flaticon.com/icons/svg/803/803253.svg",
-                     }}
-                     resizeMethod="resize"
-                  />
-                  <View style={styles.canal_texts}>
-                     <Text style={styles.canal_texts_nome}>
-                        {e.channel_name}
-                     </Text>
-                     <Text style={styles.canal_texts_currentProgram}>
-                        {e.group}
-                     </Text>
-                  </View>
-               </>
-            </TouchableHighlight>
-         );
-      });
+   function Body({ item }) {
+      let e = item;
+      return (
+         <TouchableHighlight
+            onPress={() =>
+               navigation.navigate("Player", {
+                  url: e.video_url,
+                  name: e.channel_name,
+                  group: e.group,
+               })
+            }
+            style={styles.canal}
+            underlayColor="rgb(200,200,200)"
+         >
+            <>
+               <Image
+                  resizeMode="contain"
+                  style={styles.canal_img}
+                  source={{
+                     uri: e.img
+                        ? e.img
+                        : "https://image.flaticon.com/icons/svg/803/803253.svg",
+                  }}
+                  resizeMethod="resize"
+               />
+               <View style={styles.canal_texts}>
+                  <Text style={styles.canal_texts_nome}>{e.channel_name}</Text>
+                  <Text style={styles.canal_texts_currentProgram}>
+                     {e.group}
+                  </Text>
+               </View>
+            </>
+         </TouchableHighlight>
+      );
    }
 
    function NavOption(props) {
       return (
-         <TouchableHighlight underlayColor="rgb(200,200,200)" onPress={()=>search(props.search)} style={styles.navigator_buttons}>
+         <TouchableHighlight
+            underlayColor="rgb(200,200,200)"
+            onPress={() => search(props.search)}
+            style={styles.navigator_buttons}
+         >
             <>
                <Image
                   style={styles.navigator_buttons_image}
@@ -125,7 +120,7 @@ export default function ChannelOptions({ route, navigation }) {
                   resizeMethod="resize"
                   source={props.source}
                />
-               <Text style={styles.navigator_buttons_text}>{props.title}</Text>
+               <Text>{props.title}</Text>
             </>
          </TouchableHighlight>
       );
@@ -142,7 +137,6 @@ export default function ChannelOptions({ route, navigation }) {
          }
       });
       setCurrentList(newList);
-      ScrollDiv.current.scrollTo({x: 0,y: 0})
    }
 
    if (!currentList)
@@ -157,8 +151,19 @@ export default function ChannelOptions({ route, navigation }) {
    return (
       <View style={styles.all}>
          <View style={styles.search}>
-            <TouchableHighlight underlayColor="rgb(150,150,150)" onPress={()=>navigation.goBack()} style={styles.search_back}>
-               <><Image style={styles.backButton} resizeMethod="resize" resizeMode="contain" source={require('./assets/left-arrow.png')}/></>
+            <TouchableHighlight
+               underlayColor="rgb(150,150,150)"
+               onPress={() => navigation.goBack()}
+               style={styles.search_back}
+            >
+               <>
+                  <Image
+                     style={styles.backButton}
+                     resizeMethod="resize"
+                     resizeMode="contain"
+                     source={require("./assets/left-arrow.png")}
+                  />
+               </>
             </TouchableHighlight>
             <TextInput
                onChangeText={(e) => search(e)}
@@ -167,17 +172,39 @@ export default function ChannelOptions({ route, navigation }) {
                style={styles.search_input}
             />
          </View>
-         <ScrollView ref={ScrollDiv} style={styles.ScrollView}>
-            <View style={styles.container}>
-               <Body />
-            </View>
-         </ScrollView>
+         <FlatList
+            keyExtractor={e=>e.channel_name+Math.round(Math.random()*8246)}
+            data={data}
+            renderItem={Body}
+            style={styles.ScrollView}
+            initialNumToRender={currentList.length}
+         />
          <View style={styles.navigator}>
-            <NavOption search="[24H]" source={require("./assets/clock.png")} title="Canais 24h"/>
-            <NavOption search="Infantis" source={require("./assets/baby.png")} title="Infantis"/>
-            <NavOption search="4K FHDR" source={require("./assets/4k.png")} title="4K"/>
-            <NavOption search="HBO" source={require("./assets/hbo.png")} title="HBOs"/>
-            <NavOption search="Variedades" source={require("./assets/variety.png")} title="Variedades"/>
+            <NavOption
+               search="[24H]"
+               source={require("./assets/clock.png")}
+               title="Canais 24h"
+            />
+            <NavOption
+               search="Infantis"
+               source={require("./assets/baby.png")}
+               title="Infantis"
+            />
+            <NavOption
+               search="4K FHDR"
+               source={require("./assets/4k.png")}
+               title="4K"
+            />
+            <NavOption
+               search="HBO"
+               source={require("./assets/hbo.png")}
+               title="HBOs"
+            />
+            <NavOption
+               search="Variedades"
+               source={require("./assets/variety.png")}
+               title="Variedades"
+            />
          </View>
       </View>
    );
@@ -214,8 +241,8 @@ const styles = StyleSheet.create({
       width: "96%",
       alignItems: "center",
       justifyContent: "space-around",
-      flexDirection: 'row',
-      paddingVertical: 5
+      flexDirection: "row",
+      paddingVertical: 5,
    },
    search_input: {
       padding: 5,
@@ -243,20 +270,17 @@ const styles = StyleSheet.create({
       height: "50%",
       width: "50%",
    },
-   navigator_buttons_text: {
-      fontSize: 10
-   },
    search_back: {
-      backgroundColor: 'rgb(200,200,200)',
+      backgroundColor: "rgb(200,200,200)",
       padding: 8,
       borderRadius: 100,
-      right: 3
+      right: 3,
    },
    backButton: {
       height: 20,
       width: 20,
-      tintColor: 'black'
-   }
+      tintColor: "black",
+   },
 });
 
 /*<Text style={styles.canal_texts_currentProgram}>

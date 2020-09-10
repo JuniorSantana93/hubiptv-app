@@ -88,10 +88,21 @@ export default function Home({navigation}) {
         <Text style={styles.title}>{props.text}</Text>
         )
     }
+    let NavOption = (props)=>{
+        return (
+            <TouchableHighlight underlayColor="rgb(200,200,200)" onPress={()=>true} style={styles.navigator_navigatorOption}>
+                <>
+                <Image style={styles.navigator_navigatorOption_image} resizeMethod="resize" resizeMode="contain" source={props.source}/>
+                <Text style={styles.navigator_navigatorOption_text}>{props.text}</Text>
+                </>
+            </TouchableHighlight>
+        )
+    }
 
     // Render
    return (
-    <ScrollView decelerationRate="fast">
+    <View style={{flex: 1}}>
+        <ScrollView decelerationRate="fast">
         <StatusBar translucent={false} style="dark" backgroundColor="white"/>
         <View style={styles.container}>
         <Image resizeMethod="resize" resizeMode="contain" style={styles.logo} source={imgs.logo_black}/>
@@ -118,6 +129,11 @@ export default function Home({navigation}) {
         />
         </View>
     </ScrollView>
+    <View style={styles.navigator}>
+        <NavOption text="Home" source={require('./assets/sydney-opera-house.png')}/>
+        <NavOption text="Home" source={require('./assets/settings.png')}/>
+    </View>
+    </View>
    )
 };
 
@@ -243,5 +259,25 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '10%',
         tintColor: 'rgb(40,40,40)'
+    },
+    navigator: {
+        height: 60,
+        width: '100%',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+    navigator_navigatorOption: {
+        height: '100%',
+        width: '50%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    navigator_navigatorOption_image: {
+        width: '50%',
+        height: '50%'
+    },
+    navigator_navigatorOption_text: {
+        fontSize: 10
     }
 })
