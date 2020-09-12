@@ -4,7 +4,7 @@ import {
    Text,
    View,
    TouchableHighlight,
-   ScrollView,
+   FlatList,
    Image,
    ActivityIndicator,
    TextInput,
@@ -14,23 +14,17 @@ export default function ChannelOptions({ route, navigation }) {
    // Use state
    let [p, setP] = useState(route.params);
    let [data, setData] = useState(null);
-   let [isMounted, setIsMounted] = useState(false);
    let [currentList, setCurrentList] = useState(null);
-   let [showLimit,setShowLimit] = useState(100);
-   let ScrollDiv = useRef('scrolldiv');
-
    // Use effect
    useEffect(() => {
       (async () => {
-         if (isMounted) return;
-         setIsMounted(true);
          let req = await fetch(p.list_url);
          let res = await req.text();
          res = getJsonList(res);
          setData(res);
          setCurrentList(res);
       })();
-   });
+   },[]);
 
    // Functions
 
@@ -72,11 +66,8 @@ export default function ChannelOptions({ route, navigation }) {
       return channels;
    }
 
-   function Body() {
-      let count = 0;
-      return currentList.map((e) => {
-         count++;
-         if (count > showLimit) return;
+   function Body({item}) {
+         let e = item;
          return (
             <TouchableHighlight
                onPress={() =>
@@ -84,6 +75,8 @@ export default function ChannelOptions({ route, navigation }) {
                      url: e.video_url,
                      name: e.channel_name,
                      group: e.group,
+                     image: e.img,
+                     list: currentList
                   })
                }
                key={e.channel_name + Math.round(Math.random() * 1000)}
@@ -112,12 +105,11 @@ export default function ChannelOptions({ route, navigation }) {
                </>
             </TouchableHighlight>
          );
-      });
    }
 
    function NavOption(props) {
       return (
-         <TouchableHighlight underlayColor="rgb(200,200,200)" onPress={()=>search(props.search)} style={styles.navigator_buttons}>
+         <TouchableHighlight underlayColor="rgb(200,200,200)" onPress={props.isNav ? ()=>navigation.navigate(props.page,props.params) : ()=>search(props.search)} style={styles.navigator_buttons}>
             <>
                <Image
                   style={styles.navigator_buttons_image}
@@ -142,7 +134,6 @@ export default function ChannelOptions({ route, navigation }) {
          }
       });
       setCurrentList(newList);
-      ScrollDiv.current.scrollTo({x: 0,y: 0})
    }
 
    if (!currentList)
@@ -167,17 +158,20 @@ export default function ChannelOptions({ route, navigation }) {
                style={styles.search_input}
             />
          </View>
-         <ScrollView ref={ScrollDiv} style={styles.ScrollView}>
-            <View style={styles.container}>
-               <Body />
-            </View>
-         </ScrollView>
+         <FlatList 
+            disableVirtualization={true}
+            initialNumToRender={100}
+            keyExtractor={e => e.channel_name + Math.round(Math.random() * 8787676)}
+            style={styles.ScrollView}
+            data={currentList}
+            renderItem={Body}
+         />
          <View style={styles.navigator}>
             <NavOption search="[24H]" source={require("./assets/clock.png")} title="Canais 24h"/>
             <NavOption search="Infantis" source={require("./assets/baby.png")} title="Infantis"/>
             <NavOption search="4K FHDR" source={require("./assets/4k.png")} title="4K"/>
             <NavOption search="HBO" source={require("./assets/hbo.png")} title="HBOs"/>
-            <NavOption search="Variedades" source={require("./assets/variety.png")} title="Variedades"/>
+            <NavOption page="Favoritos" params={{list: currentList}} source={require("./assets/star.png")} isNav title="Favoritos"/>
          </View>
       </View>
    );

@@ -90,7 +90,7 @@ export default function Home({navigation}) {
     }
     let NavOption = (props)=>{
         return (
-            <TouchableHighlight underlayColor="rgb(200,200,200)" onPress={()=>true} style={styles.navigator_navigatorOption}>
+            <TouchableHighlight underlayColor="rgb(200,200,200)" onPress={props.onPress} style={[styles.navigator_navigatorOption,{backgroundColor: props.selected ? 'rgb(200,200,200)' : undefined}]}>
                 <>
                 <Image style={styles.navigator_navigatorOption_image} resizeMethod="resize" resizeMode="contain" source={props.source}/>
                 <Text style={styles.navigator_navigatorOption_text}>{props.text}</Text>
@@ -129,10 +129,10 @@ export default function Home({navigation}) {
         />
         </View>
     </ScrollView>
-    <View style={styles.navigator}>
-        <NavOption text="Home" source={require('./assets/sydney-opera-house.png')}/>
-        <NavOption text="Home" source={require('./assets/settings.png')}/>
-    </View>
+        <View style={styles.navigator}>
+            <NavOption selected text="Início" source={require('./assets/sydney-opera-house.png')}/>
+            <NavOption onPress={()=>navigation.navigate('Configurações')} text="Configurações" source={require('./assets/settings.png')}/>
+        </View>
     </View>
    )
 };
